@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  endlessh:
+    image: lscr.io/linuxserver/endlessh:latest
+    container_name: endlessh
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MSDELAY=10000
+      - MAXLINES=32
+      - MAXCLIENTS=4096
+      - LOGFILE=false
+    ports:
+      - 22:2222
+    restart: unless-stopped
+
+  fail2ban:
+    image: lscr.io/linuxserver/fail2ban:1.0.2
+    container_name: fail2ban
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./config:/config
+      - /var/log:/var/log:ro
+    restart: unless-stopped
+
+

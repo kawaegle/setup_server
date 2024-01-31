@@ -1,0 +1,6 @@
+SQL_DB=db-name
+SQL_USER=username
+SQL_PASSWORD=password
+DB_TYPE=mysql
+DISABLE_REGISTRATION=true
+APP_NAME="OppaiGIT"

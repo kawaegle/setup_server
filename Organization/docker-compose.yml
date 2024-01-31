@@ -1,0 +1,77 @@
+version: "3"
+
+services:
+  vikunja_db:
+    image: mariadb:10
+    container_name: vikunja_db
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - vikunja_db:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - ssl-orga
+
+  vikunja_api:
+    container_name: vikunja_api
+    image: vikunja/api:0.21
+    environment:
+      VIKUNJA_DATABASE_HOST: ${VIKUNJA_DATABASE_HOST}
+      VIKUNJA_DATABASE_PASSWORD: ${MYSQL_PASSWORD}
+      VIKUNJA_DATABASE_TYPE: ${VIKUNJA_DATABASE_TYPE}
+      VIKUNJA_DATABASE_USER: ${MYSQL_USER}
+      VIKUNJA_DATABASE_DATABASE: ${MYSQL_DATABASE}
+      VIKUNJA_SERVICE_JWTSECRET: ${VIKUNJA_SERVICE_JWTSECRET}
+      VIKUNJA_SERVICE_FRONTENDURL: ${VIKUNJA_SERVICE_FRONTENDURL}
+      VIRTUAL_HOST: vikunja-api.oppaiweeb.tech
+      VIRTUAL_PORT: 3456
+      LETSENCRYPT_HOST: vikunja-api.oppaiweeb.tech
+    volumes:
+      - vikunja_data:/app/vikunja/files
+    depends_on:
+      - vikunja_db
+    restart: unless-stopped
+    networks:
+      - ssl-orga
+
+  vikunja_frontend:
+    container_name: vikunja_front
+    image: vikunja/frontend:0.21
+    environment:
+      VIKUNJA_API_URL: ${VIKUNJA_API_URL}
+      VIRTUAL_HOST: vikunja.oppaiweeb.tech
+      VIRTUAL_PORT: 80
+      LETSENCRYPT_HOST: vikunja.oppaiweeb.tech
+    restart: unless-stopped
+    depends_on:
+      - vikunja_api
+    networks:
+      - ssl-orga
+
+  shlink:
+    container_name: shlink
+    image: shlinkio/shlink:stable-roadrunner
+    environment:
+      DEFAULT_DOMAIN: sh.oppaiweeb.tech
+      IS_HTTPS_ENABLED: "true"
+      GEOLITE_LICENSE_KEY: ${SHLINK_GEO_API}
+      VIRTUAL_HOST: sh.oppaiweeb.tech
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: sh.oppaiweeb.tech
+    networks:
+      - ssl-orga
+    volumes:
+      - shlink_data:/etc/shlink
+
+volumes:
+  vikunja_db:
+  vikunja_data:
+  shlink_data:
+
+networks:
+  ssl-orga:
+    external: true

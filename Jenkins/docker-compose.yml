@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  jenkins:
+    build: .
+    container_name: jenkins
+    privileged: true
+    restart: always
+    user: root
+    volumes:
+      - jenkins:/var/jenkins_home
+      - /run/docker.sock:/var/run/docker.sock
+    networks:
+      - ssl-jenkins
+    environment:
+      - VIRTUAL_HOST=test.oppaiweeb.tech
+      - LETSENCRYPT_HOST=test.oppaiweeb.tech
+      - VIRTUAL_PORT=8080
+
+volumes:
+  jenkins:
+
+networks:
+  ssl-jenkins:
+    external: true

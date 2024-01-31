@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+  db:
+    image: mariadb:10
+    restart: unless-stopped
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - database_volume:/var/lib/mysql
+    networks:
+        - db-net
+
+  passbolt:
+    image: passbolt/passbolt:latest-ce
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      APP_FULL_BASE_URL: https://pass.oppaiweeb.tech
+      DATASOURCES_DEFAULT_HOST: "db"
+      DATASOURCES_DEFAULT_USERNAME: ${MYSQL_USER}
+      DATASOURCES_DEFAULT_PASSWORD: ${MYSQL_PASSWORD}
+      DATASOURCES_DEFAULT_DATABASE: ${MYSQL_DATABASE}
+      VIRTUAL_HOST: pass.oppaiweeb.tech
+      LETSENCRYPT_HOST: pass.oppaiweeb.tech
+      VIRTUAL_PORT: 80
+    volumes:
+      - gpg_volume:/etc/passbolt/gpg
+      - jwt_volume:/etc/passbolt/jwt
+    command:
+      [
+        "/usr/bin/wait-for.sh",
+        "-t",
+        "0",
+        "db:3306",
+        "--",
+        "/docker-entrypoint.sh",
+      ]
+    networks:
+      - db-net
+      - ssl-pass
+
+volumes:
+  database_volume:
+  gpg_volume:
+  jwt_volume:
+
+networks:
+  db-net:
+    external: false
+  ssl-pass:
+    external: true

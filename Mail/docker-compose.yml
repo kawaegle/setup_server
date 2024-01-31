@@ -1,0 +1,48 @@
+version: '3'
+
+networks:
+  ssl-mail:
+    external: true
+volumes:
+  mail_data:
+  cube:
+  cude-db:
+
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    hostname: mail.oppaiweeb.tech
+    networks:
+        - ssl-mail
+    volumes:
+      - mail_data:/var/mail/
+      - mail_data:/var/mail-state/
+      - mail_data:/var/log/mail/
+      - mail_data:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      ENABLE_RSPAMD: 1
+      ENABLE_FAIL2BAN: 1
+      VIRTUAL_HOST: mail.oppaiweeb.tech
+      LETSENCRYPT_HOST: mail.oppaiweeb.tech
+      VIRTUAL_PORT: 25,465,587,993,80
+    cap_add:
+      - NET_ADMIN # For Fail2Ban to work
+    restart: always
+
+  roundcubemail:
+    image: roundcube/roundcubemail:latest
+    container_name: roundcubemail
+    restart: unless-stopped
+    volumes:
+      - cube:/var/www/html
+      - cude-db:/var/roundcube/db
+    environment:
+      ROUNDCUBEMAIL_DB_TYPE: "sqlite"
+      ROUNDCUBEMAIL_SKIN: elastic
+      ROUNDCUBEMAIL_DEFAULT_HOST: tls://mail.oppaiweeb.tech
+      ROUNDCUBEMAIL_SMTP_SERVER: tls://mail.oppaiweeb.tech
+      VIRTUAL_HOST: mail.oppaiweeb.tech
+      VIRTUAL_PORT: 25,465,587,993,80
+      LETSENCRYPT_HOST: mail.oppaiweeb.tech
