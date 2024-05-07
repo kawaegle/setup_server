@@ -34,7 +34,7 @@ services:
       - "465:465"
       - "587:587"
       - "993:993"
-    hostname: ${VIRTUAL_HOST}
+    hostname: ${VIRTUAL_HOST} # remove the line of the /etc/postfix/main.cf mydestination = localhost.$mydomain, localhost
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
       timeout: 3s
