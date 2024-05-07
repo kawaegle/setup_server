@@ -1,0 +1,12 @@
+SQL_DB=db-name
+SQL_USER=username
+SQL_PASSWORD=password
+DB_TYPE=mysql
+DISABLE_REGISTRATION=true
+APP_NAME="OppaiGIT"
+MAILER_FROM="noreply@mail.example.test"
+MAIL_SERVER="mail.example.test"
+MAIL_USER="git-bot"
+MAIL_PASS="password"
+VIRTUAL_HOST="git.example.test"
+VIRTUAL_PORT=3000

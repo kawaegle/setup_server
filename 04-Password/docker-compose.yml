@@ -1,0 +1,22 @@
+networks:
+  ssl_pass:
+    external: true
+
+volumes:
+  data:
+
+services:
+  password:
+    image: vaultwarden/server:alpine
+    container_name: vaultwarden
+    restart: always
+    volumes:
+      - data:/data/
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_PORT}
+    networks:
+      - ssl_pass
+
+

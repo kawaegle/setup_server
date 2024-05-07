@@ -1,0 +1,24 @@
+networks:
+  ssl_jenkins:
+    external: true
+
+volumes:
+  jenkins:
+
+services:
+  jenkins:
+    image: jenkins/jenkins:2.453
+    container_name: jenkins
+    restart: always
+    user: root
+    volumes:
+      - jenkins:/var/jenkins_home
+      - /run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    networks:
+      - ssl_jenkins
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${VIRTUAL_HOST}
+      - VIRTUAL_PORT=${VIRTUAL_PORT}
+    privileged: true

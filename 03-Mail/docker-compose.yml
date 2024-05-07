@@ -1,0 +1,98 @@
+networks:
+  mail:
+  ssl_mail:
+    external: true
+
+volumes:
+  mail_data:
+  mail_state:
+  mail_logs:
+  mail_config:
+  webmail_db:
+  webmail_web:
+
+services:
+  mail_server:
+    image: mailserver/docker-mailserver:13.3.1
+    container_name: mail_server
+    restart: always
+    volumes:
+      - mail_data:/var/mail/
+      - mail_state:/var/mail-state/
+      - mail_logs:/var/log/mail/
+      - mail_config:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+      - ../01-SSL/certs/:/etc/letsencrypt/live/:ro
+    environment:
+      SSL_TYPE: letsencrypt
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+      PERMIT_DOCKER: network
+    ports:
+      - "25:25"
+      - "143:143"
+      - "465:465"
+      - "587:587"
+      - "993:993"
+    hostname: ${VIRTUAL_HOST}
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 0
+    stop_grace_period: 1m
+
+  webmail_client:
+    image: roundcube/roundcubemail:1.6.6-fpm-alpine
+    container_name: webmail_client
+    restart: always
+    depends_on:
+      - webmail_db
+    volumes:
+      - webmail_web:/var/www/html
+    networks:
+      - mail
+    environment:
+      ROUNDCUBEMAIL_SMTP_SERVER: tls://${VIRTUAL_HOST}
+      ROUNDCUBEMAIL_DEFAULT_HOST: tls://${VIRTUAL_HOST}
+      ROUNDCUBEMAIL_DEFAULT_PORT: 143
+      ROUNDCUBEMAIL_SMTP_PORT: 587
+      ROUNDCUBEMAIL_DB_TYPE: pgsql
+      ROUNDCUBEMAIL_DB_HOST: ${DB_HOST}
+      ROUNDCUBEMAIL_DB_NAME: ${DB_NAME}
+      ROUNDCUBEMAIL_DB_USER: ${DB_USER}
+      ROUNDCUBEMAIL_DB_PASSWORD: ${DB_PASS}
+      ROUNDCUBEMAIL_SKIN: elastic
+
+  webmail_nginx:
+    image: nginx:alpine
+    container_name: webmail_nginx
+    restart: always
+    depends_on:
+      - webmail_client
+    volumes:
+      - webmail_web:/var/www/html
+      - ./nginx-template.conf:/etc/nginx/templates/default.conf.template
+    environment:
+      NGINX_HOST: webmail_client
+      NGINX_PHP_CGI: webmail_client:9000
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_PORT}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+    networks:
+      - ssl_mail
+      - mail
+    links:
+      - webmail_client
+
+  webmail_db:
+    image: postgres:15
+    container_name: ${DB_HOST}
+    restart: always
+    volumes:
+      - webmail_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    networks:
+      - mail

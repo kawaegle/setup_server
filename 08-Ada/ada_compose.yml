@@ -1,0 +1,42 @@
+networks:
+  ada:
+  ssl_ada:
+    external: true
+
+volumes:
+  ada_db:
+
+services:
+  ada:
+    image: docker.io/theohmmr/ada:dev
+    container_name: ada
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PORT: ${VIRTUAL_PORT}
+      NODE_ENV: "development"
+      DEV_DB_HOST: ada_db
+      DEV_DB_NAME: ${MYSQL_DATABASE}
+      DEV_DB_USER: ${MYSQL_USER}
+      DEV_DB_PASS: ${MYSQL_PASSWORD}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_PORT}
+    networks:
+      - ada
+      - ssl-ada
+
+  db:
+    image: mariadb:10
+    container_name: ada_db
+    restart: always
+    volumes:
+      - ada_db:/var/lib/mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: true
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+        - ada

@@ -1,0 +1,62 @@
+networks:
+  ssl:
+  ssl_jenkins:
+    external: true
+  ssl_git:
+    external: true
+  ssl_penpot:
+    external: true
+  ssl_orga:
+    external: true
+  ssl_reverseme:
+    external: true
+  ssl_mail:
+    external: true
+  ssl_pass:
+    external: true
+
+volumes:
+  nginx_conf:
+  vhost:
+  nginx_html:
+  acme:
+
+services:
+  nginx_proxy:
+    image: nginxproxy/nginx-proxy:1.3-alpine
+    container_name: nginx_proxy
+    restart: always
+    volumes:
+      - nginx_conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - nginx_html:/usr/share/nginx/html
+      - ./certs:/etc/nginx/certs:ro
+      - /run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - ssl
+      - ssl_jenkins
+      - ssl_git
+      - ssl_penpot
+      - ssl_orga
+      - ssl_reverseme
+      - ssl_mail
+      - ssl_pass
+    ports:
+      - "80:80"
+      - "443:443"
+
+  acme_companion:
+    image: nginxproxy/acme-companion:2.2
+    container_name: nginx_proxy_acme
+    restart: always
+    volumes_from:
+      - nginx_proxy
+    volumes:
+      - ./certs:/etc/nginx/certs:rw
+      - acme:/etc/acme.sh
+      - /run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DEFAULT_EMAIL=contact@mail.oppaiweeb.tech
+    networks:
+      - ssl
+

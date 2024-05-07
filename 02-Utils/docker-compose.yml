@@ -1,0 +1,32 @@
+services:
+  endlessh:
+    image: lscr.io/linuxserver/endlessh:latest
+    container_name: endlessh
+    restart: always
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - MSDELAY=10000
+      - MAXLINES=32
+      - MAXCLIENTS=4096
+      - LOGFILE=false
+    ports:
+      - 22:2222
+
+  fail2ban:
+    image: lscr.io/linuxserver/fail2ban:1.0.2
+    container_name: fail2ban
+    restart: always
+    volumes:
+      - ./jail.conf:/config/fail2ban/jain.conf
+      - /var/log:/var/log:ro
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+

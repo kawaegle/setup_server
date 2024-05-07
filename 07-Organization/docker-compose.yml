@@ -1,0 +1,86 @@
+networks:
+  vikunja:
+  ssl_orga:
+    external: true
+
+volumes:
+  vikunja_db:
+  vikunja_data:
+  shlink_data:
+
+services:
+  vikunja_api:
+    image: vikunja/api:0.21
+    container_name: vikunja_api
+    restart: always
+    depends_on:
+      - vikunja_db
+    volumes:
+      - vikunja_data:/app/vikunja/files
+    environment:
+      VIKUNJA_DATABASE_HOST: ${VIKUNJA_DATABASE_HOST}
+      VIKUNJA_DATABASE_PASSWORD: ${MYSQL_PASSWORD}
+      VIKUNJA_DATABASE_TYPE: ${VIKUNJA_DATABASE_TYPE}
+      VIKUNJA_DATABASE_USER: ${MYSQL_USER}
+      VIKUNJA_DATABASE_DATABASE: ${MYSQL_DATABASE}
+      VIKUNJA_SERVICE_JWTSECRET: ${VIKUNJA_SERVICE_JWTSECRET}
+      VIKUNJA_SERVICE_FRONTENDURL: ${VIKUNJA_SERVICE_FRONTENDURL}
+
+      VIKUNJA_MAILER_ENABLED: ${VIKUNJA_MAILER_ENABLED}
+      VIKUNJA_MAILER_HOST: ${VIKUNJA_MAILER_HOST}
+      VIKUNJA_MAILER_PORT: ${VIKUNJA_MAILER_PORT}
+      VIKUNJA_MAILER_USERNAME: ${VIKUNJA_MAILER_USERNAME}
+      VIKUNJA_MAILER_FROMEMAIL: ${VIKUNJA_MAILER_FROMEMAIL}
+
+      VIRTUAL_HOST: ${VIRTUAL_VIKUNJA_API_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_VIKUNJA_API_PORT}
+      LETSENCRYPT_HOST: ${VIRTUAL_VIKUNJA_API_HOST}
+    networks:
+      - ssl_orga
+      - vikunja
+
+  vikunja_frontend:
+    image: vikunja/frontend:0.21
+    container_name: vikunja_front
+    restart: unless-stopped
+    depends_on:
+      - vikunja_api
+    environment:
+      VIKUNJA_API_URL: ${VIKUNJA_API_URL}
+      VIRTUAL_HOST: ${VIRTUAL_VIKUNJA_FRONT_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_VIKUNJA_FRONT_PORT}
+      LETSENCRYPT_HOST: ${VIRTUAL_VIKUNJA_FRONT_HOST}
+    networks:
+      - ssl_orga
+      - vikunja
+
+  vikunja_db:
+    image: mariadb:10
+    container_name: vikunja_db
+    restart: always
+    volumes:
+      - vikunja_db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    networks:
+      - vikunja
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  shlink:
+    image: shlinkio/shlink:stable-roadrunner
+    container_name: shlink
+    restart: always
+    volumes:
+      - shlink_data:/etc/shlink
+    environment:
+      DEFAULT_DOMAIN: ${VIRTUAL_SHLINK_HOST}
+      IS_HTTPS_ENABLED: "true"
+      GEOLITE_LICENSE_KEY: ${SHLINK_GEO_API}
+      VIRTUAL_HOST: ${VIRTUAL_SHLINK_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_SHLINK_PORT}
+      LETSENCRYPT_HOST: ${VIRTUAL_SHLINK_HOST}
+    networks:
+      - ssl_orga
