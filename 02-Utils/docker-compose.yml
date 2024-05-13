@@ -1,16 +1,12 @@
 services:
   endlessh:
-    image: lscr.io/linuxserver/endlessh:latest
+    image: shizunge/endlessh-go:latest
     container_name: endlessh
     restart: always
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Paris
-      - MSDELAY=10000
-      - MAXLINES=32
-      - MAXCLIENTS=4096
-      - LOGFILE=false
+    command:
+      - -interval_ms=1000
+      - -logtostderr
+      - -v=1
     ports:
       - 22:2222
 
