@@ -21,6 +21,7 @@ services:
       - mail_state:/var/mail-state/
       - mail_logs:/var/log/mail/
       - mail_config:/tmp/docker-mailserver/
+      - ./postfix.cf:/tmp/docker-mailserver/postfix-main.cf
       - /etc/localtime:/etc/localtime:ro
       - ../01-SSL/certs/:/etc/letsencrypt/live/:ro
     environment:
@@ -34,12 +35,13 @@ services:
       - "465:465"
       - "587:587"
       - "993:993"
-    hostname: ${VIRTUAL_HOST} # remove the line of the /etc/postfix/main.cf mydestination = localhost.$mydomain, localhost
+    hostname: ${VIRTUAL_HOST}
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
       timeout: 3s
       retries: 0
     stop_grace_period: 1m
+    domainname: ${VIRTUAL_HOST} # ${DOMAINNAME}
 
   webmail_client:
     image: roundcube/roundcubemail:1.6.6-fpm-alpine
