@@ -8,24 +8,24 @@ volumes:
 
 services:
   ada:
-    image: docker.io/theohmmr/ada:dev
+    image: docker.io/theohmmr/ada:v1.2.6
     container_name: ada
     restart: always
     depends_on:
       - db
     environment:
       PORT: ${VIRTUAL_PORT}
-      NODE_ENV: "development"
-      DEV_DB_HOST: ada_db
-      DEV_DB_NAME: ${MYSQL_DATABASE}
-      DEV_DB_USER: ${MYSQL_USER}
-      DEV_DB_PASS: ${MYSQL_PASSWORD}
+      NODE_ENV: ${NODE_ENV}
+      PROD_DB_HOST: ${DB_HOST}
+      PROD_DB_NAME: ${MYSQL_DATABASE}
+      PROD_DB_USER: ${MYSQL_USER}
+      PROD_DB_PASS: ${MYSQL_PASSWORD}
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       LETSENCRYPT_HOST: ${VIRTUAL_HOST}
       VIRTUAL_PORT: ${VIRTUAL_PORT}
     networks:
       - ada
-      - ssl-ada
+      - ssl_ada
 
   db:
     image: mariadb:10
@@ -34,7 +34,7 @@ services:
     volumes:
       - ada_db:/var/lib/mysql
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: true
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
