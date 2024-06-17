@@ -1,6 +1,6 @@
 networks:
-  vikunja:
-  ssl_orga:
+ vikunja:
+ ssl_orga:
     external: true
 
 volumes:
@@ -10,7 +10,7 @@ volumes:
 
 services:
   vikunja_api:
-    image: vikunja/api:0.21
+    image: vikunja/api:0.22
     container_name: vikunja_api
     restart: always
     depends_on:
@@ -25,10 +25,13 @@ services:
       VIKUNJA_DATABASE_DATABASE: ${MYSQL_DATABASE}
       VIKUNJA_SERVICE_JWTSECRET: ${VIKUNJA_SERVICE_JWTSECRET}
       VIKUNJA_SERVICE_FRONTENDURL: ${VIKUNJA_SERVICE_FRONTENDURL}
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: false
 
       VIKUNJA_MAILER_ENABLED: ${VIKUNJA_MAILER_ENABLED}
       VIKUNJA_MAILER_HOST: ${VIKUNJA_MAILER_HOST}
       VIKUNJA_MAILER_PORT: ${VIKUNJA_MAILER_PORT}
+      VIKUNJA_MAILER_FORCESSL: true
+      VIKUNJA_MAILER_AUTHTYPE: ${VIKUNJA_MAILER_AUTHTYPE}
       VIKUNJA_MAILER_USERNAME: ${VIKUNJA_MAILER_USERNAME}
       VIKUNJA_MAILER_FROMEMAIL: ${VIKUNJA_MAILER_FROMEMAIL}
 
@@ -40,9 +43,9 @@ services:
       - vikunja
 
   vikunja_frontend:
-    image: vikunja/frontend:0.21
+    image: vikunja/frontend:0.22
     container_name: vikunja_front
-    restart: unless-stopped
+    restart: always
     depends_on:
       - vikunja_api
     environment:
@@ -82,5 +85,18 @@ services:
       VIRTUAL_HOST: ${VIRTUAL_SHLINK_HOST}
       VIRTUAL_PORT: ${VIRTUAL_SHLINK_PORT}
       LETSENCRYPT_HOST: ${VIRTUAL_SHLINK_HOST}
+    networks:
+      - ssl_orga
+
+  shlink_web:
+    image: shlinkio/shlink-web-client:4
+    container_name: shlink_web
+    restart: unless-stopped
+    environment:
+      SHLINK_SERVER_URL: ${VIRTUAL_SHLINK_HOST}
+      SHLINK_SERVER_API_KEY: ${SHLINK_API}
+      VIRTUAL_HOST: ${VIRTUAL_SHLINKWEB_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_SHLINK_PORT}
+      LETSENCRYPT_HOST: ${VIRTUAL_SHLINKWEB_HOST}
     networks:
       - ssl_orga
