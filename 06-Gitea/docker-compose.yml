@@ -14,9 +14,9 @@ services:
     restart: always
     volumes:
       - gitea_data:/data
-      - ./theme.css:$GITEA_CUSTOM/public/assets/css
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - ./themes:/data/gitea/public/assets/
     depends_on:
       - db
     environment:
@@ -31,12 +31,14 @@ services:
       GITEA__service__REQUIRE_SIGNIN_VIEW: ${DISABLE_REGISTRATION}
       GITEA__mailer__ENABLED: true
       GITEA__mailer__FROM: ${MAILER_FROM}
-      GITEA__mailer__PROTOCOL: starttls
+      GITEA__mailer__PROTOCOL: smtp+starttls
       GITEA__mailer__SMTP_ADDR: ${MAIL_SERVER}
       GITEA__mailer__SMTP_PORT: 587
       GITEA__mailer__USER: ${MAIL_USER}
       GITEA__mailer__PASSWD: ${MAIL_PASS}
       GITEA__APP_NAME: ${APP_NAME}
+      GITEA__ui__DEFAULT_THEME: gitea-auto
+      GITEA__ui__THEMES: ${THEMES_LIST}
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       LETSENCRYPT_HOST: ${VIRTUAL_HOST}
       VIRTUAL_PORT: ${VIRTUAL_PORT}
