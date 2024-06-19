@@ -2,7 +2,7 @@ services:
   endlessh:
     image: shizunge/endlessh-go:latest
     container_name: endlessh
-    restart: always
+    restart: unless-stopped
     command:
       - -interval_ms=1000
       - -logtostderr
@@ -13,7 +13,7 @@ services:
   fail2ban:
     image: lscr.io/linuxserver/fail2ban:1.0.2
     container_name: fail2ban
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./jail.conf:/config/fail2ban/jain.conf
       - /var/log:/var/log:ro

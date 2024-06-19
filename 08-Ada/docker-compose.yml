@@ -10,7 +10,7 @@ services:
   ada:
     image: docker.io/theohmmr/ada:v1.2.6
     container_name: ada
-    restart: always
+    restart: unless-stoped
     depends_on:
       - db
     environment:
@@ -30,7 +30,7 @@ services:
   db:
     image: mariadb:10
     container_name: ada_db
-    restart: always
+    restart: unless-stoped
     volumes:
       - ada_db:/var/lib/mysql
     environment:

@@ -9,7 +9,7 @@ services:
   password:
     image: vaultwarden/server:alpine
     container_name: vaultwarden
-    restart: always
+    restart: unless-stopped
     volumes:
       - data:/data/
     environment:

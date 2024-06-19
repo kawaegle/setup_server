@@ -13,9 +13,9 @@ volumes:
 
 services:
   mail_server:
-    image: mailserver/docker-mailserver:13.3.1
+    image: mailserver/docker-mailserver:14.0
     container_name: mail_server
-    restart: always
+    restart: unless-stopped
     volumes:
       - mail_data:/var/mail/
       - mail_state:/var/mail-state/
@@ -28,7 +28,7 @@ services:
       SSL_TYPE: letsencrypt
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       LETSENCRYPT_HOST: ${VIRTUAL_HOST}
-      PERMIT_DOCKER: network
+      PERMIT_DOCKER: none
     ports:
       - "25:25"
       - "143:143"
@@ -36,17 +36,18 @@ services:
       - "587:587"
       - "993:993"
     hostname: ${VIRTUAL_HOST}
+    cap_add:
+      - NET_ADMIN
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
       timeout: 3s
       retries: 0
     stop_grace_period: 1m
-    domainname: ${VIRTUAL_HOST} # ${DOMAINNAME}
 
   webmail_client:
     image: roundcube/roundcubemail:1.6.6-fpm-alpine
     container_name: webmail_client
-    restart: always
+    restart: unless-stopped
     depends_on:
       - webmail_db
     volumes:
@@ -68,7 +69,7 @@ services:
   webmail_nginx:
     image: nginx:alpine
     container_name: webmail_nginx
-    restart: always
+    restart: unless-stopped
     depends_on:
       - webmail_client
     volumes:
@@ -89,7 +90,7 @@ services:
   webmail_db:
     image: postgres:15
     container_name: ${DB_HOST}
-    restart: always
+    restart: unless-stopped
     volumes:
       - webmail_db:/var/lib/postgresql/data
     environment:

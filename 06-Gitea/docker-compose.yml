@@ -11,7 +11,7 @@ services:
   gitea_server:
     image: gitea/gitea:1.21
     container_name: gitea_server
-    restart: always
+    restart: unless-stopped
     volumes:
       - gitea_data:/data
       - /etc/timezone:/etc/timezone:ro
@@ -51,7 +51,7 @@ services:
   db:
     image: mariadb:10
     container_name: gitea_db
-    restart: always
+    restart: unless-stopped
     volumes:
       - gitea_db:/var/lib/mysql
     environment:
