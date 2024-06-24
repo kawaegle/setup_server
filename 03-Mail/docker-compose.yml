@@ -26,8 +26,8 @@ services:
       - ../01-SSL/certs/:/etc/letsencrypt/live/:ro
     environment:
       SSL_TYPE: letsencrypt
-      VIRTUAL_HOST: ${VIRTUAL_HOST}
-      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_HOST: ${VIRTUAL_HTTPS_HOST}
+      LETSENCRYPT_HOST: ${VIRTUAL_HTTPS_HOST}
       PERMIT_DOCKER: none
     ports:
       - "25:25"
@@ -35,7 +35,7 @@ services:
       - "465:465"
       - "587:587"
       - "993:993"
-    hostname: ${VIRTUAL_HOST}
+    hostname: ${SMTP_HOST_EIP}
     cap_add:
       - NET_ADMIN
     healthcheck:
@@ -55,8 +55,8 @@ services:
     networks:
       - mail
     environment:
-      ROUNDCUBEMAIL_SMTP_SERVER: tls://${VIRTUAL_HOST}
-      ROUNDCUBEMAIL_DEFAULT_HOST: tls://${VIRTUAL_HOST}
+      ROUNDCUBEMAIL_SMTP_SERVER: tls://${SMTP_HOST_EIP}
+      ROUNDCUBEMAIL_DEFAULT_HOST: tls://${SMTP_HOST_EIP}
       ROUNDCUBEMAIL_DEFAULT_PORT: 143
       ROUNDCUBEMAIL_SMTP_PORT: 587
       ROUNDCUBEMAIL_DB_TYPE: pgsql
@@ -78,9 +78,9 @@ services:
     environment:
       NGINX_HOST: webmail_client
       NGINX_PHP_CGI: webmail_client:9000
-      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_HOST: ${VIRTUAL_HTTPS_HOST}
       VIRTUAL_PORT: ${VIRTUAL_PORT}
-      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${VIRTUAL_HTTPS_HOST}
     networks:
       - ssl_mail
       - mail

@@ -1,1 +1,1 @@
-mydestination = localhost.$mydomain, localhost
+mydestination = localhost.$mydomain, localhost, $mydomain
