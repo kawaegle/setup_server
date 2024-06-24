@@ -82,8 +82,6 @@ services:
     container_name: shlink_web
     restart: unless-stopped
     environment:
-      SHLINK_SERVER_URL: ${VIRTUAL_SHLINK_HOST}
-      SHLINK_SERVER_API_KEY: ${SHLINK_API}
       VIRTUAL_HOST: ${VIRTUAL_SHLINKWEB_HOST}
       VIRTUAL_PORT: ${VIRTUAL_SHLINK_PORT}
       LETSENCRYPT_HOST: ${VIRTUAL_SHLINKWEB_HOST}
