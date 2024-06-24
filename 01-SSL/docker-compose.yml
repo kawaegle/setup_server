@@ -16,6 +16,8 @@ networks:
     external: true
   ssl_ada:
     external: true
+  ssl_eip:
+    external: true
 
 volumes:
   nginx_conf:
@@ -43,6 +45,7 @@ services:
       - ssl_reverseme
       - ssl_mail
       - ssl_pass
+      - ssl_eip
       - ssl_ada
     ports:
       - "80:80"
