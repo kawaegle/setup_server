@@ -5,7 +5,7 @@ networks:
 
 services:
   eip_web:
-    image: nginx:alpine
+    image: nginx:alpine-slim
     container_name: wic_web
     restart: unless-stopped
     volumes:
