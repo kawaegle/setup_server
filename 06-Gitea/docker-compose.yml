@@ -39,6 +39,8 @@ services:
       GITEA__APP_NAME: ${APP_NAME}
       GITEA__ui__DEFAULT_THEME: gitea-auto
       GITEA__ui__THEMES: ${THEMES_LIST}
+      GITEA__repository__DISABLE_HTTP_GIT: false
+      GITEA__repository__DEFAULT_BRANCH: ${DEFAULT_BRANCH}
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       LETSENCRYPT_HOST: ${VIRTUAL_HOST}
       VIRTUAL_PORT: ${VIRTUAL_PORT}
