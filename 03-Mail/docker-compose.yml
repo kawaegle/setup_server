@@ -25,9 +25,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ../01-SSL/certs/:/etc/letsencrypt/live/:ro
     environment:
-      SSL_TYPE: letsencrypt
+      SSL_TYPE: ${SSL_TYPE}
       VIRTUAL_HOST: ${VIRTUAL_HTTPS_HOST}
-      LETSENCRYPT_HOST: ${VIRTUAL_HTTPS_HOST}
       PERMIT_DOCKER: none
     ports:
       - "25:25"
