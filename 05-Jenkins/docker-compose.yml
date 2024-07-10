@@ -38,24 +38,22 @@ services:
     restart: unless-stopped
     depends_on:
       - sonar_db
-      - ssl_jenkins
     volumes:
       - sonarqube_conf:/opt/sonarqube/conf
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_temp:/opt/sonarqube/temp
-      - LETSENCRYPT_HOST: ${SONAR_HOST}
-      - VIRTUAL_HOST: ${SONAR_HOST}
-      - VIRTUAL_PORT: ${SONAR_PORT}
     networks:
         - sonar
+        - ssl_jenkins
     environment:
       SONAR_JDBC_URL: jdbc:postgresql://Sonar_db:5432/sonar
       SONAR_JDBC_USERNAME: ${SONAR_DB_USERNAME}
       SONAR_JDBC_PASSWORD: ${SONAR_DB_PASSWORD}
-    # ports:
-    #   - "9001:9000"
+      LETSENCRYPT_HOST: ${SONAR_HOST}
+      VIRTUAL_HOST: ${SONAR_HOST}
+      VIRTUAL_PORT: ${SONAR_PORT}
 
   sonar_db:
     image: postgres:15
@@ -70,5 +68,3 @@ services:
       POSTGRES_USER: ${SONAR_DB_USERNAME}
       POSTGRES_PASSWORD: ${SONAR_DB_PASSWORD}
       POSTGRES_DB: sonar
-
-
