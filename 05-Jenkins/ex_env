@@ -2,3 +2,5 @@ VIRTUAL_HOST=jenkins.example.test
 VIRTUAL_PORT=8080
 SONAR_DB_USERNAME=user
 SONAR_DB_PASSWORD= password
+SONAR_HOST=https://sonar.example.test
+SONAR_PORT=9000

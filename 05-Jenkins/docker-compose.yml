@@ -38,12 +38,16 @@ services:
     restart: unless-stopped
     depends_on:
       - sonar_db
+      - ssl_jenkins
     volumes:
       - sonarqube_conf:/opt/sonarqube/conf
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_temp:/opt/sonarqube/temp
+      - LETSENCRYPT_HOST: ${SONAR_HOST}
+      - VIRTUAL_HOST: ${SONAR_HOST}
+      - VIRTUAL_PORT: ${SONAR_PORT}
     networks:
         - sonar
     environment:
