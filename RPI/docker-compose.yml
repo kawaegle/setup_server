@@ -1,0 +1,41 @@
+networks:
+  ssl_dashboard:
+
+volumes:
+  home-config:
+  pihole:
+  dnsmask:
+
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - home-config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    environment:
+       VIRTUAL_HOST: ${VIRTUAL_HOST}
+       VIRTUAL_PORT: ${VIRTUAL_PORT}
+       LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+    restart: unless-stopped
+    networks:
+      - ssl_dashboard
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8080:80"
+    environment:
+      TZ: 'America/Chicago'
+      WEBPASSWORD: "Tq74p*,-lZ=|*A="
+    # Volumes store your data between container upgrades
+    volumes:
+      - 'pihole:/etc/pihole'
+      - 'dnsmask:/etc/dnsmasq.d'
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped

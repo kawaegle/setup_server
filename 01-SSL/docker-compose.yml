@@ -14,6 +14,8 @@ networks:
     external: true
   ssl_pass:
     external: true
+  rpi_ssl_dashboard:
+    external: true
 
 volumes:
   nginx_conf:
@@ -41,6 +43,7 @@ services:
       - ssl_reverseme
       - ssl_mail
       - ssl_pass
+      - rpi_ssl_dashboard
     ports:
       - "80:80"
       - "443:443"
