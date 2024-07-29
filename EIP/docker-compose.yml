@@ -1,0 +1,20 @@
+networks:
+  mail:
+  ssl_eip:
+    external: true
+
+services:
+  eip_web:
+    image: nginx:alpine-slim
+    container_name: wic_web
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html/
+      - ./nginx-template.conf:/etc/nginx/templates/default.conf.template
+    environment:
+      NGINX_HOST: wic_web
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_PORT}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+    networks:
+      - ssl_eip

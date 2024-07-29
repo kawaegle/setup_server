@@ -9,14 +9,13 @@ volumes:
   shlink_data:
 
 services:
-  vikunja_api:
-    image: vikunja/api:0.21
-    container_name: vikunja_api
-    restart: always
+  vikunja:
+    image: vikunja/vikunja:unstable
+    container_name: vikunja
+    restart: unless-stopped
     depends_on:
-      - vikunja_db
-    volumes:
-      - vikunja_data:/app/vikunja/files
+      vikunja_db:
+        condition: service_healthy
     environment:
       VIKUNJA_DATABASE_HOST: ${VIKUNJA_DATABASE_HOST}
       VIKUNJA_DATABASE_PASSWORD: ${MYSQL_PASSWORD}
@@ -24,32 +23,21 @@ services:
       VIKUNJA_DATABASE_USER: ${MYSQL_USER}
       VIKUNJA_DATABASE_DATABASE: ${MYSQL_DATABASE}
       VIKUNJA_SERVICE_JWTSECRET: ${VIKUNJA_SERVICE_JWTSECRET}
-      VIKUNJA_SERVICE_FRONTENDURL: ${VIKUNJA_SERVICE_FRONTENDURL}
+      VIKUNJA_SERVICE_PUBLICURL: https://${VIRTUAL_VIKUNJA_API}
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: false
 
       VIKUNJA_MAILER_ENABLED: ${VIKUNJA_MAILER_ENABLED}
+      VIKUNJA_SERVICE_ENABLEEMAILREMINDERS: true
       VIKUNJA_MAILER_HOST: ${VIKUNJA_MAILER_HOST}
       VIKUNJA_MAILER_PORT: ${VIKUNJA_MAILER_PORT}
+      VIKUNJA_MAILER_AUTHTYPE: ${VIKUNJA_MAILER_AUTHTYPE}
       VIKUNJA_MAILER_USERNAME: ${VIKUNJA_MAILER_USERNAME}
+      VIKUNJA_MAILER_PASSWORD: ${VIKUNJA_MAILER_PASSWORD}
       VIKUNJA_MAILER_FROMEMAIL: ${VIKUNJA_MAILER_FROMEMAIL}
 
-      VIRTUAL_HOST: ${VIRTUAL_VIKUNJA_API_HOST}
-      VIRTUAL_PORT: ${VIRTUAL_VIKUNJA_API_PORT}
-      LETSENCRYPT_HOST: ${VIRTUAL_VIKUNJA_API_HOST}
-    networks:
-      - ssl_orga
-      - vikunja
-
-  vikunja_frontend:
-    image: vikunja/frontend:0.21
-    container_name: vikunja_front
-    restart: unless-stopped
-    depends_on:
-      - vikunja_api
-    environment:
-      VIKUNJA_API_URL: ${VIKUNJA_API_URL}
-      VIRTUAL_HOST: ${VIRTUAL_VIKUNJA_FRONT_HOST}
-      VIRTUAL_PORT: ${VIRTUAL_VIKUNJA_FRONT_PORT}
-      LETSENCRYPT_HOST: ${VIRTUAL_VIKUNJA_FRONT_HOST}
+      VIRTUAL_HOST: ${VIRTUAL_VIKUNJA_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_VIKUNJA_PORT}
+      LETSENCRYPT_HOST: ${VIRTUAL_VIKUNJA_HOST}
     networks:
       - ssl_orga
       - vikunja
@@ -57,7 +45,7 @@ services:
   vikunja_db:
     image: mariadb:10
     container_name: vikunja_db
-    restart: always
+    restart: unless-stopped
     volumes:
       - vikunja_db:/var/lib/mysql
     environment:
@@ -68,11 +56,15 @@ services:
     networks:
       - vikunja
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u $$MYSQL_USER --password=$$MYSQL_PASSWORD"]
+      interval: 2s
+      start_period: 30s
 
   shlink:
     image: shlinkio/shlink:stable-roadrunner
     container_name: shlink
-    restart: always
+    restart: unless-stopped
     volumes:
       - shlink_data:/etc/shlink
     environment:
@@ -82,5 +74,16 @@ services:
       VIRTUAL_HOST: ${VIRTUAL_SHLINK_HOST}
       VIRTUAL_PORT: ${VIRTUAL_SHLINK_PORT}
       LETSENCRYPT_HOST: ${VIRTUAL_SHLINK_HOST}
+    networks:
+      - ssl_orga
+
+  shlink_web:
+    image: shlinkio/shlink-web-client:4
+    container_name: shlink_web
+    restart: unless-stopped
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_SHLINKWEB_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_SHLINK_PORT}
+      LETSENCRYPT_HOST: ${VIRTUAL_SHLINKWEB_HOST}
     networks:
       - ssl_orga

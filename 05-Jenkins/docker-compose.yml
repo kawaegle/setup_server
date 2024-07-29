@@ -7,9 +7,9 @@ volumes:
 
 services:
   jenkins:
-    image: jenkins/jenkins:2.453
+    image: jenkins/jenkins:2.460
     container_name: jenkins
-    restart: always
+    restart: unless-stopped
     user: root
     volumes:
       - jenkins:/var/jenkins_home

@@ -1,6 +1,7 @@
+DB_HOST=ada_db
 MYSQL_USER=user
 MYSQL_DATABASE=db_name
 MYSQL_PASSWORD=password
 VIRTUAL_HOST=ada.example.test
 VIRTUAL_PORT=4000
-
+NODE_ENV="production"

@@ -11,7 +11,7 @@ services:
   penpot_frontend:
     image: penpotapp/frontend:2.0.1
     container_name: penpot_frontend
-    restart: always
+    restart: unless-stopped
     volumes:
       - penpot_data:${PENPOT_STORAGE_ASSETS_FS_DIRECTORY}
     depends_on:
@@ -32,7 +32,7 @@ services:
   penpot_backend:
     image: penpotapp/backend:2.0.1
     container_name: penpot_backend
-    restart: always
+    restart: unless-stopped
     volumes:
       - penpot_data:${PENPOT_STORAGE_ASSETS_FS_DIRECTORY}
     depends_on:
@@ -64,7 +64,7 @@ services:
   penpot_exporter:
     image: penpotapp/exporter:2.0.1
     container_name: penpot_exporter
-    restart: always
+    restart: unless-stopped
     environment:
       PENPOT_PUBLIC_URI: ${VIRTUAL_HOST}
       PENPOT_REDIS_URI: ${PENPOT_REDIS_URI}
@@ -74,7 +74,7 @@ services:
   penpot_db:
     image: postgres:15
     container_name: penpot_db
-    restart: always
+    restart: unless-stopped
     stop_signal: SIGINT
     volumes:
       - penpot_db:/var/lib/postgresql/data
@@ -89,6 +89,6 @@ services:
   penpot_redis:
     image: redis:7-alpine
     container_name: penpot_redis
-    restart: always
+    restart: unless-stopped
     networks:
       - penpot
