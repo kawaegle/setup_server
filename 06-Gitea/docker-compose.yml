@@ -17,6 +17,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - ./themes:/data/gitea/public/assets/
+      - ./license:/data/gitea/options/license
     depends_on:
       - db
     environment:
