@@ -80,7 +80,7 @@ services:
   shlink_web:
     image: shlinkio/shlink-web-client:4
     container_name: shlink_web
-    restart: unless-stopped
+    restart: no
     environment:
       VIRTUAL_HOST: ${VIRTUAL_SHLINKWEB_HOST}
       VIRTUAL_PORT: ${VIRTUAL_SHLINK_PORT}

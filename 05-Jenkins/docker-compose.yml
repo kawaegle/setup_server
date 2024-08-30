@@ -1,21 +1,13 @@
 networks:
   ssl_jenkins:
     external: true
-  sonar:
 
 volumes:
   jenkins:
-  sonarqube_conf:
-  sonarqube_data:
-  sonarqube_extensions:
-  sonarqube_logs:
-  sonarqube_temp:
-  sonar_db:
-  sonar_db_data:
 
 services:
   jenkins:
-    image: jenkins/jenkins:2.460
+    image: jenkins/jenkins:2.474
     container_name: jenkins
     restart: unless-stopped
     user: root
@@ -25,46 +17,8 @@ services:
       - /usr/bin/docker:/usr/bin/docker
     networks:
       - ssl_jenkins
-      - sonar
     environment:
       - VIRTUAL_HOST=${VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${VIRTUAL_HOST}
       - VIRTUAL_PORT=${VIRTUAL_PORT}
     privileged: true
-
-  sonarqube:
-    image: sonarqube:lts-community
-    container_name: sonar
-    restart: unless-stopped
-    depends_on:
-      - sonar_db
-    volumes:
-      - sonarqube_conf:/opt/sonarqube/conf
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
-      - sonarqube_logs:/opt/sonarqube/logs
-      - sonarqube_temp:/opt/sonarqube/temp
-    networks:
-        - sonar
-        - ssl_jenkins
-    environment:
-      SONAR_JDBC_URL: jdbc:postgresql://Sonar_db:5432/sonar
-      SONAR_JDBC_USERNAME: ${SONAR_DB_USERNAME}
-      SONAR_JDBC_PASSWORD: ${SONAR_DB_PASSWORD}
-      LETSENCRYPT_HOST: ${SONAR_HOST}
-      VIRTUAL_HOST: ${SONAR_HOST}
-      VIRTUAL_PORT: ${SONAR_PORT}
-
-  sonar_db:
-    image: postgres:15
-    container_name: sonar_db
-    restart: unless-stopped
-    volumes:
-      - sonar_db:/var/lib/postgresql
-      - sonar_db_data:/var/lib/postgresql/data
-    networks:
-        - sonar
-    environment:
-      POSTGRES_USER: ${SONAR_DB_USERNAME}
-      POSTGRES_PASSWORD: ${SONAR_DB_PASSWORD}
-      POSTGRES_DB: sonar
