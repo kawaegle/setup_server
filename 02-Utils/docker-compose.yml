@@ -1,3 +1,10 @@
+networks:
+  ssl_vpn:
+    external: true
+
+volumes:
+  vpn_data:
+
 services:
   endlessh:
     image: shizunge/endlessh-go:latest
@@ -26,3 +33,42 @@ services:
       - NET_RAW
     network_mode: host
 
+  openvpn:
+    container_name: openvpn
+    image: d3vilh/openvpn-server:latest
+    privileged: true
+    ports:
+      - "1194:1194/udp"
+    environment:
+      TRUST_SUB: 10.0.70.0/24
+      GUEST_SUB: 10.0.71.0/24
+      HOME_SUB: 192.168.88.0/24
+    volumes:
+      - ./vpn/pki:/etc/openvpn/pki
+      - ./vpn/clients:/etc/openvpn/clients
+      - ./vpn/config:/etc/openvpn/config
+      - ./vpn/staticclients:/etc/openvpn/staticclients
+      - ./vpn/log:/var/log/openvpn
+      - ./vpn/fw-rules.sh:/opt/app/fw-rules.sh
+      - ./vpn/server.conf:/etc/openvpn/server.conf
+    cap_add:
+      - NET_ADMIN
+    restart: always
+
+  openvpn-ui:
+    container_name: openvpn-ui
+    image: d3vilh/openvpn-ui:latest
+    environment:
+      OPENVPN_ADMIN_USERNAME: ${VPN_USER}
+      OPENVPN_ADMIN_PASSWORD: ${VPN_PASS}
+      VIRTUAL_HOST: ${VPN_HOST}
+      LETSENCRYPT_HOST: ${VPN_HOST}
+      VIRTUAL_PORT: ${VPN_PORT}
+    networks:
+      - ssl_vpn
+    volumes:
+      - ./vpn/:/etc/openvpn
+      - ./vpn/db:/opt/openvpn-ui/db
+      - ./vpn/pki:/usr/share/easy-rsa/pki
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
