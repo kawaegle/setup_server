@@ -4,7 +4,7 @@ networks:
     external: true
   ssl_git:
     external: true
-  ssl_penpot:
+  ssl_vpn:
     external: true
   ssl_orga:
     external: true
@@ -40,7 +40,7 @@ services:
       - ssl
       - ssl_jenkins
       - ssl_git
-      - ssl_penpot
+      - ssl_vpn
       - ssl_orga
       - ssl_reverseme
       - ssl_mail
