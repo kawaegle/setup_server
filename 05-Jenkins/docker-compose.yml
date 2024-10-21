@@ -7,13 +7,13 @@ volumes:
 
 services:
   jenkins:
-    image: jenkins/jenkins:2.474
+    image: jenkins/jenkins:2.481
     container_name: jenkins
     restart: unless-stopped
     user: root
     volumes:
       - jenkins:/var/jenkins_home
-      - /run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
     networks:
       - ssl_jenkins
