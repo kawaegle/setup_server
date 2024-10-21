@@ -53,6 +53,8 @@ services:
       - ./vpn/server.conf:/etc/openvpn/server.conf
     cap_add:
       - NET_ADMIN
+    networks:
+      - ssl_vpn
     restart: always
 
   openvpn-ui:
