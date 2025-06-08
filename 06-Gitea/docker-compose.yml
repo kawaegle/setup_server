@@ -6,6 +6,7 @@ networks:
 volumes:
   gitea_db:
   gitea_data:
+  lfs:
 
 services:
   gitea_server:
@@ -14,6 +15,7 @@ services:
     restart: unless-stopped
     volumes:
       - gitea_data:/data
+      - lfs:/data/lfs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - ./themes:/data/gitea/public/assets/
@@ -39,6 +41,9 @@ services:
       GITEA__mailer__PASSWD: ${MAIL_PASS}
       GITEA__APP_NAME: ${APP_NAME}
       GITEA__ui__DEFAULT_THEME: gitea-auto
+      GITEA__server__LFS_START_SERVER: true
+      GITEA__lfs__PATH: /data/lfs
+      GITEA__repository__upload__FILE_MAX_SIZE: 512
       GITEA__ui__THEMES: ${THEMES_LIST}
       GITEA__repository__DISABLE_HTTP_GIT: false
       GITEA__repository__DEFAULT_BRANCH: ${DEFAULT_BRANCH}

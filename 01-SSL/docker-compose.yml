@@ -18,6 +18,8 @@ networks:
     external: true
   ssl_eip:
     external: true
+  ssl_post:
+    external: true
 
 volumes:
   nginx_conf:
@@ -32,6 +34,8 @@ services:
     restart: unless-stopped
     volumes:
       - nginx_conf:/etc/nginx/conf.d
+      - ../06-Gitea/custom_nginx.conf:/etc/nginx/vhost.d/git.oppaiweeb.tech:ro
+      - ../06-Gitea/custom_nginx.conf:/etc/nginx/vhost.d/git.wicgames.tech:ro
       - vhost:/etc/nginx/vhost.d
       - nginx_html:/usr/share/nginx/html
       - ./certs:/etc/nginx/certs:ro
@@ -47,6 +51,7 @@ services:
       - ssl_pass
       - ssl_eip
       - ssl_ada
+      - ssl_post
     ports:
       - "80:80"
       - "443:443"
@@ -62,7 +67,7 @@ services:
       - acme:/etc/acme.sh
       - /run/docker.sock:/var/run/docker.sock:ro
     environment:
-      - DEFAULT_EMAIL=contact@mail.oppaiweeb.tech
+      - DEFAULT_EMAIL=admin@mail.oppaiweeb.tech
     networks:
       - ssl
 

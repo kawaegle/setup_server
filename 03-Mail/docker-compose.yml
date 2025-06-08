@@ -12,8 +12,20 @@ volumes:
   webmail_web:
 
 services:
+  web_mail:
+    image: nginx:alpine-slim
+    container_name: web_mail
+    restart: unless-stopped
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HTTPS_HOST}
+      LETSENCRYPT_HOST: ${VIRTUAL_HTTPS_HOST}
+      # LETSENCRYPT_HOST: mail.oppaiweeb.tech
+      VIRTUAL_PORT: 80
+    networks:
+      - ssl_mail
+
   mail_server:
-    image: mailserver/docker-mailserver:14.0
+    image: mailserver/docker-mailserver:15.0
     container_name: mail_server
     restart: unless-stopped
     volumes:

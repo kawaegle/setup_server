@@ -10,7 +10,7 @@ volumes:
 
 services:
   vikunja:
-    image: vikunja/vikunja:unstable
+    image: vikunja/vikunja
     container_name: vikunja
     restart: unless-stopped
     depends_on:
@@ -62,7 +62,7 @@ services:
       start_period: 30s
 
   shlink:
-    image: shlinkio/shlink:stable-roadrunner
+    image: shlinkio/shlink:stable
     container_name: shlink
     restart: unless-stopped
     volumes:
@@ -77,13 +77,3 @@ services:
     networks:
       - ssl_orga
 
-  shlink_web:
-    image: shlinkio/shlink-web-client:4
-    container_name: shlink_web
-    restart: no
-    environment:
-      VIRTUAL_HOST: ${VIRTUAL_SHLINKWEB_HOST}
-      VIRTUAL_PORT: ${VIRTUAL_SHLINK_PORT}
-      LETSENCRYPT_HOST: ${VIRTUAL_SHLINKWEB_HOST}
-    networks:
-      - ssl_orga

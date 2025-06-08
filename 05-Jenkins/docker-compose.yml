@@ -9,6 +9,7 @@ services:
   jenkins:
     image: jenkins/jenkins:2.504-jdk21
     container_name: jenkins
+    hostname: "jenkins.local"
     restart: unless-stopped
     user: root
     volumes:

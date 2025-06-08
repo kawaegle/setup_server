@@ -6,32 +6,16 @@ volumes:
   vpn_data:
 
 services:
-  endlessh:
-    image: shizunge/endlessh-go:latest
-    container_name: endlessh
-    restart: unless-stopped
-    command:
-      - -interval_ms=1000
-      - -logtostderr
-      - -v=1
-    ports:
-      - 22:2222
-
-  fail2ban:
-    image: lscr.io/linuxserver/fail2ban:1.0.2
-    container_name: fail2ban
-    restart: unless-stopped
-    volumes:
-      - ./jail.conf:/config/fail2ban/jain.conf
-      - /var/log:/var/log:ro
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Paris
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    network_mode: host
+  # endlessh:
+  #   image: shizunge/endlessh-go:latest
+  #   container_name: endlessh
+  #   restart: unless-stopped
+  #   command:
+  #     - -interval_ms=1000
+  #     - -logtostderr
+  #     - -v=1
+  #   ports:
+  #     - 22:2222
 
   openvpn:
     container_name: openvpn
@@ -55,7 +39,7 @@ services:
       - NET_ADMIN
     networks:
       - ssl_vpn
-    restart: always
+    restart: unless-stopped
 
   openvpn-ui:
     container_name: openvpn-ui
@@ -73,4 +57,4 @@ services:
       - ./vpn/db:/opt/openvpn-ui/db
       - ./vpn/pki:/usr/share/easy-rsa/pki
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: always
+    restart: unless-stopped
