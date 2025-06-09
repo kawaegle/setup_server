@@ -1,0 +1,12 @@
+questions:
+  - type: short-text
+    label: What is your name ? (can be your discord username)
+
+  - type: yes-no
+    label: Do you want to be a player? (just want to play and have fun while reporting unexpected bug)
+  - type: yes-no
+    label: Do you want to be a tester? (want to explicitly break the game)
+
+  - type: email
+    label: Please Enter your email.
+

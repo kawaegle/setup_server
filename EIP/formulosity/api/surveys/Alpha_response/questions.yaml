@@ -1,0 +1,80 @@
+questions:
+  - type: rating
+    label: How responsive and intuitive did the controls feel?
+    min: 1
+    max: 5
+
+  - type: rating
+    label: Were the movement mechanics (jumping, dodging, attacking) satisfying?
+    min: 1
+    max: 5
+
+  - type: rating
+    label: Did combat feel fluid and impactful (hit feedback,visual effects, etc.)?
+    min: 1
+    max: 5
+
+  - type: long-text
+    label: Were there any actions or controls that felt awkward or unnecessary?
+    validation:
+      min: 10
+      max: 150
+
+  - type: single-choice
+    label: How would you rate the difficulty balance?
+    options:
+      - too easy
+      - well balanced
+      - too hard
+
+  - type: single-choice
+    label: How did the number of enemies feel?
+    options:
+      - too few
+      - just right
+      - too many
+
+  - type: long-text
+    label: Did you encounter any frustrating or unfair moments? If so, describe them
+    validation:
+      min: 0
+      max: 150
+
+  - type: rating
+    label: If the alpha included upgrades or skills (e.g., new abilities), would they have been useful?
+    min: 1
+    max: 5
+
+  - type: long-text
+    label: Were there any missing features you’d expect in this type of game?
+    validation:
+      min: 10
+      max: 150
+
+  - type: yes-no
+    label: Did you encounter any bugs or technical issues?
+
+  - type: single-choice
+    label: How would you rate overall performance (smoothness, input lag, etc.)?
+    options:
+      - smooth
+      - minor slowdowns
+      - Unplayable
+
+  - type: long-text
+    label: What was the most enjoyable aspect of the gameplay?
+    validation:
+      min: 10
+      max: 150
+
+  - type: long-text
+    label: What would you prioritize changing or improving ?
+    validation:
+      min: 10
+      max: 150
+
+  - type: short-text
+    label: If you had to use one word to describe the game, what would it be ?
+    validation:
+      min: 2
+      max: 20

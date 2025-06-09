@@ -1,0 +1,65 @@
+networks:
+  forms:
+    external: false
+  ssl_post:
+    external: true
+
+services:
+  api:
+    restart: always
+    build:
+      context: ./api
+    # depends_on:
+    #   - postgres
+    environment:
+      # DATABASE_TYPE: postgres # postgres|sqlite
+      # DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable
+      DATABASE_TYPE: sqlite
+      DATABASE_URL: /root/sqlite3/formulosity.db
+      SURVEYS_DIR: /root/surveys
+      UPLOADS_DIR: /root/uploads
+
+      VIRTUAL_PORT: ${PORT_API}
+      VIRTUAL_HOST: ${API}
+      LETSENCRYPT_HOST: ${API}
+    volumes:
+      - ./api/surveys:/root/surveys
+      - ./api/sqlite3:/root/sqlite3
+      - ./api/uploads:/root/uploads
+    networks:
+      # - forms
+      - ssl_post
+
+  ui:
+    restart: always
+    build:
+      context: ./ui
+    environment:
+      CONSOLE_API_ADDR_INTERNAL: https://${API}
+      CONSOLE_API_ADDR: https://${API}
+
+      VIRTUAL_HOST: ${HOST}
+      LETSENCRYPT_HOST: ${HOST}
+      VIRTUAL_PORT: ${PORT}
+
+      IRON_SESSION_SECRET: ${SECRET}
+      HTTP_BASIC_AUTH: ${ADMIN_USER}:${ADMIN_PASSWORD}
+    depends_on:
+      - api
+    networks:
+      # - forms
+      - ssl_post
+
+  # postgres:
+  #   image: postgres:16.0-alpine
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: ${DB_USER}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     POSTGRES_DB: ${DB_NAME}
+  #   # ports:
+  #   #   - "5432:5432"
+  #   volumes:
+  #     - ./api/postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - forms
